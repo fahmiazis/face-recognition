@@ -113,7 +113,7 @@ class Login extends Component {
                             ) : null}
                             <button disabled={(values.username === 'p000' || values.username === 'P000') && values.cost_center === '' ? true : false} onClick={handleSubmit} className={style.button}>LOGIN</button>
                         </div>
-                        <div className='icon mt-4'><AiOutlineCopyrightCircle size={18} className="mr-3" />OFR-PMA 2022</div>
+                        <div className='icon mt-4'><AiOutlineCopyrightCircle size={18} className="mr-3" />Escoil 2023</div>
                 </Form>
                 )}
                 </Formik>
