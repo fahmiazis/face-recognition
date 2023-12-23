@@ -5,11 +5,11 @@ import qs from 'qs'
 export default {
     login: (data) => ({
         type: 'AUTH_USER',
-        payload: http().post(`/bracket/login`, qs.stringify(data)),
+        payload: http().patch(`/bracket/login`, qs.stringify(data)),
     }),
     register: (data) => ({
         type: 'REGISTER_USER',
-        payload: http().post(`/bracket/register`, qs.stringify(data)),
+        payload: http().patch(`/bracket/register`, qs.stringify(data)),
     }),
     generateBracket: (token, data) => ({
         type: 'GEN_BRACKET',
