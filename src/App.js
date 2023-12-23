@@ -6,6 +6,8 @@ import auth from './redux/actions/auth'
 import PrivateRoute from './components/PrivateRoute'
 
 import Login from './pages/Login'
+import Register from './pages/Register'
+import Home from './pages/Home'
 
 //For Tes
 import Tes from './pages/Tes'
@@ -24,11 +26,12 @@ class App extends Component {
             <Switch>
                 {/* Tanpa login */}
                 <Route path='/login' exact component={Login} /> 
+                <Route path='/register' exact component={Register} /> 
                 <Route path='/tes' exact component={Tes} />
                 
                 {/* Harus login */}
                 <PrivateRoute path='/' exact>
-                    <Tes />
+                    <Home />
                 </PrivateRoute>
             </Switch>
         </BrowserRouter>

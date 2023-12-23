@@ -22,16 +22,25 @@ class Login extends Component {
         }
     }
 
+    register = async (values) => {
+        await this.props.register(values)
+        this.login(values)
+    }
+
     state = {
         cost_center: ''
     }
 
     componentDidUpdate() {
-        const {isLogin} = this.props.auth
+        const {isLogin, isRegister} = this.props.auth
         if (isLogin === true) {
             this.props.history.push('/')
             this.props.resetError()
         } else if (isLogin === false) {
+            setTimeout(() => {
+                this.props.resetError()
+             }, 2000)
+        } else if (isRegister === false) {
             setTimeout(() => {
                 this.props.resetError()
              }, 2000)
@@ -46,12 +55,12 @@ class Login extends Component {
     // }
 
     render() {
-        const {isLogin} = this.props.auth
+        const {isRegister} = this.props.auth
         return (
             <>
-            { isLogin === false ? (
+            { isRegister === false ? (
                 <Alert color="danger" className={style.alertWrong}>
-                    name invalid !
+                    nama sudah terdaftar !
                 </Alert>
             ): (
                 <div></div>
@@ -59,14 +68,14 @@ class Login extends Component {
             <Formik
                 initialValues={{ name: ''}}
                 validationSchema={loginSchema}
-                onSubmit={(values, { resetForm }) => {this.login(values); resetForm({ values: '' })}}>
+                onSubmit={(values, { resetForm }) => {this.register(values); resetForm({ values: '' })}}>
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched,}) => (
                 <Form className={style.bodyLogin}>
                     <div className={style.imgLogin}>
                         <img src={logo} alt='logo' className={style.imgBig} />
                     </div>
                         <div className={style.form}>
-                            <div className={style.textLogin}>Please login with your account</div>
+                            <div className={style.textLogin}>Please filled with your name</div>
                             <div>
                                 <input 
                                 className={style.input1}
@@ -82,7 +91,7 @@ class Login extends Component {
                             ) : null}
                             <button onClick={handleSubmit} className={style.button}>LOGIN</button>
                         </div>
-                        <div className='icon mt-4' onClick={() => this.props.history.push('/register')}>Belum Punya Akun, Daftar Disini</div>
+                        <div className='icon mt-4' onClick={() => this.props.history.push('/login')}>Sudah Punya Akun, Login Disini</div>
                 </Form>
                 )}
                 </Formik>
@@ -107,6 +116,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
     login: auth.login,
+    register: auth.register,
     setToken: auth.setToken,
     resetError: auth.resetError
 }

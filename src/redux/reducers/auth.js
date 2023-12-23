@@ -2,13 +2,20 @@
 
 const authState = {
     isLogin: null,
-    isRegister: false,
     token: '',
     isLoading: false,
     isError: false,
     alertMsg: '',
     level: 0,
-    isRoute: false
+    isRoute: false,
+    isRegister: null,
+    dataBracket: [],
+    allBracket: [],
+    isWin: null,
+    isDelall: null,
+    isGenerate: null,
+    isGet: null,
+    isDelid: null
 };
 
 export default (state=authState, action) => {
@@ -47,6 +54,146 @@ export default (state=authState, action) => {
                     alertMsg: 'Login Failed'
                 };
             }
+            case 'REGISTER_USER_PENDING': {
+                return {
+                    ...state,
+                    isLoading: true,
+                    alertMsg: 'Login in ....'
+                };
+            }
+            case 'REGISTER_USER_FULFILLED': {
+                return {
+                    ...state,
+                    isRegister: true,
+                    isLoading: false,
+                    alertMsg: 'Login Succesfully'
+                };
+            }
+            case 'REGISTER_USER_REJECTED': {
+                return {
+                    ...state,
+                    isLoading: false,
+                    isRegister: false,
+                    alertMsg: 'Login Failed'
+                };
+            }
+            case 'GEN_BRACKET_PENDING': {
+                return {
+                    ...state,
+                    isLoading: true,
+                    alertMsg: 'Login in ....'
+                };
+            }
+            case 'GEN_BRACKET_FULFILLED': {
+                return {
+                    ...state,
+                    isGenerate: true,
+                    isLoading: false,
+                    alertMsg: 'Login Succesfully'
+                };
+            }
+            case 'GEN_BRACKET_REJECTED': {
+                return {
+                    ...state,
+                    isLoading: false,
+                    isGenerate: false,
+                    alertMsg: 'Login Failed'
+                };
+            }
+            case 'GET_BRACKET_PENDING': {
+                return {
+                    ...state,
+                    isLoading: true,
+                    alertMsg: 'Login in ....'
+                };
+            }
+            case 'GET_BRACKET_FULFILLED': {
+                return {
+                    ...state,
+                    isGet: true,
+                    dataBracket: action.payload.data.result,
+                    allBracket: action.payload.data.resultAll,
+                    isLoading: false,
+                    alertMsg: 'Login Succesfully'
+                };
+            }
+            case 'GET_BRACKET_REJECTED': {
+                return {
+                    ...state,
+                    isLoading: false,
+                    isGet: false,
+                    alertMsg: 'Login Failed'
+                };
+            }
+            case 'WIN_BRACKET_PENDING': {
+                return {
+                    ...state,
+                    isLoading: true,
+                    alertMsg: 'Login in ....'
+                };
+            }
+            case 'WIN_BRACKET_FULFILLED': {
+                return {
+                    ...state,
+                    isWin: true,
+                    isLoading: false,
+                    alertMsg: 'Login Succesfully'
+                };
+            }
+            case 'WIN_BRACKET_REJECTED': {
+                return {
+                    ...state,
+                    isLoading: false,
+                    isWin: false,
+                    alertMsg: 'Login Failed'
+                };
+            }
+            case 'DELETE_BRACKET_PENDING': {
+                return {
+                    ...state,
+                    isLoading: true,
+                    alertMsg: 'Login in ....'
+                };
+            }
+            case 'DELETE_BRACKET_FULFILLED': {
+                return {
+                    ...state,
+                    isDelall: true,
+                    isLoading: false,
+                    alertMsg: 'Login Succesfully'
+                };
+            }
+            case 'DELETE_BRACKET_REJECTED': {
+                return {
+                    ...state,
+                    isLoading: false,
+                    isDelall: false,
+                    alertMsg: 'Login Failed'
+                };
+            }
+            case 'DELETE_ID_PENDING': {
+                return {
+                    ...state,
+                    isLoading: true,
+                    alertMsg: 'Login in ....'
+                };
+            }
+            case 'DELETE_ID_FULFILLED': {
+                return {
+                    ...state,
+                    isDelid: true,
+                    isLoading: false,
+                    alertMsg: 'Login Succesfully'
+                };
+            }
+            case 'DELETE_ID_REJECTED': {
+                return {
+                    ...state,
+                    isLoading: false,
+                    isDelid: false,
+                    alertMsg: 'Login Failed'
+                };
+            }
             case 'SET_TOKEN': {
                 return {
                   ...state,
@@ -65,7 +212,13 @@ export default (state=authState, action) => {
                 return {
                     ...state,
                     isLogin: null,
-                    isRoute: false
+                    isRoute: false,
+                    isWin: null,
+                    isDelall: null,
+                    isGenerate: null,
+                    isGet: null,
+                    isRegister: null,
+                    isDelid: null
                 }
             }
             case 'ROUTE' : {

@@ -1952,3 +1952,47 @@ a:hover{
 .tabRep {
     background-color: rgb(255, 255, 0) !important;
 }
+.secBracket {
+    border: 1px solid #9b9b9b;
+}
+.titBracket {
+    font-size: 35px;
+}
+.itemBracket {
+    background-color: #0f3b74;
+    font-size: 18px;
+    color: white;
+    padding: 5px;
+    text-transform: capitalize;
+}
+.itemBracket1 {
+    background-color: #62750c;
+    font-size: 18px;
+    color: white;
+    padding: 5px;
+    text-transform: capitalize;
+}
+.itemBracket2 {
+    background-color: #9A1353;
+    font-size: 18px;
+    color: white;
+    padding: 5px;
+    text-transform: capitalize;
+}
+.itemBracket3 {
+    background-color: #420707;
+    font-size: 18px;
+    color: white;
+    padding: 5px;
+    text-transform: capitalize;
+}
+.vsBracket {
+    text-align: center;
+}
+.widthFull {
+    /* align-self: center; */
+    justify-content: center;
+}
+.finBracket {
+    background-color: #374250;
+}
