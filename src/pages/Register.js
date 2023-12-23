@@ -89,7 +89,7 @@ class Login extends Component {
                             {errors.name ? (
                                 <text className={style.txtError}>{errors.name}</text>
                             ) : null}
-                            <button onClick={handleSubmit} className={style.button}>LOGIN</button>
+                            <button onClick={handleSubmit} className={style.button}>REGISTER</button>
                         </div>
                         <div className='icon mt-4' onClick={() => this.props.history.push('/login')}>Sudah Punya Akun, Login Disini</div>
                 </Form>
