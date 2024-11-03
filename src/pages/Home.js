@@ -1,318 +1,106 @@
 import React, { Component } from 'react'
-import {Formik} from 'formik'
-import * as Yup from 'yup'
-import auth from '../redux/actions/auth'
-import {connect} from 'react-redux'
-import { Container, Collapse, Nav, Navbar,
-    NavbarToggler, NavbarBrand, NavItem, NavLink,
-    UncontrolledDropdown, DropdownToggle, DropdownMenu, Dropdown,
-    DropdownItem, Table, ButtonDropdown, Input, Button, Col,
-    Alert, Spinner, Row, Modal, ModalBody, ModalHeader, ModalFooter} from 'reactstrap'
-import logo from '../assets/img/logo.png'
+import WheelComponent from 'react-wheel-of-prizes'
+import { Modal, ModalBody, ModalFooter, Button } from 'reactstrap'
 import style from '../assets/css/input.module.css'
-import { AiOutlineCopyrightCircle } from "react-icons/ai"
+// import 'react-wheel-of-prizes/dist/index.css'
 
-const loginSchema = Yup.object().shape({
-    username: Yup.string().required('must be filled'),
-    password: Yup.string().required('must be filled')
-});
-
-class Login extends Component {
-
-    login = async (values) => {
-        await this.props.login(values)
-        const {isLogin} = this.props.auth
-        if (isLogin) {
-            this.props.history.push('/')
-        }
-    }
-
+export default class Home extends Component {
     state = {
-        cost_center: '',
-        modalConf: false,
-        user: {}
+        // segments: [
+        //     'Andi Jutawan',
+        //     'Andika Pranata',
+        //     'Haldian',
+        //     'Ainul Yaqin'
+        //   ],
+        segments: [
+            'x50',
+            'Try again',
+            'x10',
+            'Try again',
+            'x3',
+            'Try again',
+            'x2',
+            'gacooor x500'
+        ],
+        segColors: [
+            '#EE4040',
+            '#F0CF50',
+            '#815CD1',
+            '#3DA5E0',
+            '#34A24F',
+            '#F9AA1F',
+            '#EC3F3F',
+            '#FF9000'
+          ],
+        winSegments: [
+            'better luck next time',
+            'won 70',
+            'won 10',
+        ],
+        temp: [],
+        confirm: '',
+        modalConfirm: false,
+        userWin: 0
     }
 
-    componentDidUpdate() {
-        const {isLogin} = this.props.auth
-        if (isLogin === true) {
-            this.props.history.push('/')
-            this.props.resetError()
-        } else if (isLogin === false) {
-            setTimeout(() => {
-                this.props.resetError()
-             }, 2000)
-        }
+    componentDidMount () {
+        const userWin = isNaN(localStorage.getItem('parwin')) === true ? 0 : parseInt(localStorage.getItem('parwin'))
+        this.setState({userWin: userWin})
     }
 
-    componentDidMount(){
-        this.getDataBracket()
+
+    onFinished = (val) => {
+        const { segments } = this.state
+        const userWin = isNaN(localStorage.getItem('parwin')) === true ? 0 : parseInt(localStorage.getItem('parwin'))
+        let win = userWin === segments.length - 1 ? 0 : userWin + 1
+        localStorage.setItem('parwin', win)
+        console.log(userWin)
+        console.log(win)
+        this.setState({userWin: win, confirm: val})
+        this.openModal()
     }
 
-    getDataBracket = async () => {
-        const token = localStorage.getItem('token')
-        await this.props.getBracket(token)
-        const {dataBracket, allBracket } = this.props.auth
-        console.log(allBracket)
+    openModal = () => {
+        this.setState({modalConfirm: !this.state.modalConfirm})
     }
 
-    generateDataBracket = async () => {
-        const token = localStorage.getItem('token')
-        const data = {
-            name: "Fahmi Aziz"
-        }
-        await this.props.generateBracket(token, data)
-        this.getDataBracket()
+    closeModal = () => {
+        this.setState({modalConfirm: !this.state.modalConfirm})
+        window.location.reload()
     }
 
-    deleteDataBracket = async () => {
-        const token = localStorage.getItem('token')
-        await this.props.deleteBracket(token)
-        this.getDataBracket()
-    }
 
-    deleteIdBracket = async (val) => {
-        const token = localStorage.getItem('token')
-        const data = {
-            id: val.id
-        }
-        await this.props.deleteId(token, data)
-        this.getDataBracket()
-    }
+  render() {
+    const {segments, segColors} = this.state
+    const userWin = isNaN(localStorage.getItem('parwin')) === true ? 0 : parseInt(localStorage.getItem('parwin'))
 
-    updateWinBracket = async (val) => {
-        const token = localStorage.getItem('token')
-        const data = {
-            id: val.id,
-            order: val.order
-        }
-        await this.props.winBracket(token, data)
-        this.openConf()
-        this.getDataBracket()
-    }
-
-    openConf = () => {
-        const name = localStorage.getItem('fullname')
-        name === 'Fahmi Aziz' ? 
-        this.setState({modalConf: !this.state.modalConf})
-        : console.log('tak boleh')
-    }
-
-    render() {
-        const {dataBracket, allBracket } = this.props.auth
-        const name = localStorage.getItem('fullname')
-        // console.log(dataBracket[0] !== undefined && )
-        // console.log(dataBracket[0].history.split(';')[dataBracket[0].history.split(';').length - 2].split(',')[1].split(' ')[dataBracket[0].history.split(';')[dataBracket[0].history.split(';').length - 2].split(',')[1].split(' ').length - 1])
-        return (
-            <> 
-                <div className={style.bodyDashboard}>
-                    <div className={style.headMaster}>
-                        <div className={style.titleDashboard}>Bracket Tournament Battle Lapu-Lapu 1 vs 1</div>
+    return (
+        <>
+        <div className='bodyLogin'>
+            <WheelComponent
+                segments={segments}
+                segColors={segColors}
+                // winningSegment='Try again'
+                onFinished={(winner) => this.onFinished(winner)}
+                primaryColor='black'
+                contrastColor='white'
+                buttonText='Spin'
+                isOnlyOnce={false}
+                size={290}
+                upDuration={100}
+                downDuration={1000}
+                fontFamily='Arial'
+            />
+        </div>
+            
+            <Modal isOpen={this.state.modalConfirm} toggle={this.closeModal} size='sm'>
+                <ModalBody>
+                    <div className='colCenter'>
+                        <Button color='danger' size='lg' onClick={this.closeModal}>{this.state.confirm}</Button>
                     </div>
-                    <div className={style.secHeadDashboard}>
-                        <div>
-                        </div>
-                    </div>
-                    <div className='secEmail pl-4 pr-4'>
-                        {name === 'Fahmi Aziz' ? (
-                            <div className={style.headEmail}>
-                                <Button className='' onClick={this.generateDataBracket} color="warning" size="lg">Generate Bracket</Button>
-                                <Button className='ml-2' color="success" size="lg" onClick={this.deleteDataBracket}>Delete Bracket</Button>
-                            </div>
-                        ) : (
-                            <div></div>
-                        )}
-                        <div className={style.searchEmail}>
-                        </div>
-                    </div>
-                    <Row className='mt-4 mb-2 pl-4 pr-4'>
-                        <Col md={3} xl={3} sm={12} className='secBracket'>
-                            <div className='titBracket mb-4'>
-                                All Participant
-                            </div>
-                            {allBracket.length > 0 && allBracket.map(item => {
-                                return (
-                                    <div className='itemBracket mb-2'>{item.name}{item.name === 'Fahmi Aziz' ? ' ~ Panitia' : ''}</div>
-                                )
-                            })}
-                        </Col>
-                        <Col md={3} xl={3} sm={12} className='secBracket'>
-                            <div className='titBracket mb-4'>
-                                Phase 1
-                            </div>
-                            {dataBracket.length > 0 && dataBracket.map((item, index) => {
-                                return (
-                                    item.bracket === 1 ? (
-                                        index % 2 === 1 ? (
-                                            <>
-                                                {item.status === 0 ? (
-                                                    <div className='finBracket'>
-                                                        <div className='itemBracket1 mb-2'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                        <div className='vsBracket mb-2 white'>VS</div>
-                                                        <div className='itemBracket1 mb-4'>
-                                                            {dataBracket.find(x => x.id === parseInt(item.history !== undefined && item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ')[item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ').length - 1])).name}{' (Menang)'}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <>
-                                                        <div onClick={() => {this.setState({user: item}); this.openConf()}} className='itemBracket1 mb-1'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                        {/* <div className='mb-4'>{''}</div>
-                                                        <div className='mt-4'>{''}</div> */}
-                                                    </>
-                                                )}
-                                                {item.status !== 0 && (
-                                                    <div className='vsBracket mb-1'>VS</div>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <>
-                                                {item.status === 0 ? (
-                                                    <div className='finBracket'>
-                                                        <div className='itemBracket1 mb-2'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                        <div className='vsBracket mb-2 white'>VS</div>
-                                                        <div className='itemBracket1 mb-4'>
-                                                            {dataBracket.find(x => x.id === parseInt(item.history !== undefined && item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ')[item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ').length - 1])).name}{' (Menang)'}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <>
-                                                        <div onClick={() => {this.setState({user: item}); this.openConf()}} className='itemBracket1 mb-4'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                    </>
-                                                )}
-                                            </>
-                                        )
-                                    ) : null
-                                )
-                            })}
-                        </Col>
-                        <Col md={3} xl={3} sm={12} className='secBracket'>
-                            <div className='titBracket mb-4'>
-                                Phase 2
-                            </div>
-                            {dataBracket.length > 0 && dataBracket.map((item, index) => {
-                                return (
-                                    item.bracket === 2 ? (
-                                        index % 2  === 1 ? (
-                                            <>
-                                                {item.status === 0 ? (
-                                                    <div className='finBracket'>
-                                                        <div className='itemBracket2 mb-2'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                        <div className='vsBracket mb-2 white'>VS</div>
-                                                        <div className='itemBracket2 mb-4'>
-                                                            {dataBracket.find(x => x.id === parseInt(item.history !== undefined && item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ')[item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ').length - 1])).name}{' (Menang)'}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div onClick={() => {this.setState({user: item}); this.openConf()}} className='itemBracket2 mb-1'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                )}
-                                                {item.status !== 0 && (
-                                                    <div className='vsBracket mb-1'>VS</div>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <>
-                                                {item.status === 0 ? (
-                                                    <div className='finBracket'>
-                                                        <div className='itemBracket2 mb-2'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                        <div className='vsBracket mb-2 white'>VS</div>
-                                                        <div className='itemBracket2 mb-4'>
-                                                            {dataBracket.find(x => x.id === parseInt(item.history !== undefined && item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ')[item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ').length - 1])).name}{' (Menang)'}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div onClick={() => {this.setState({user: item}); this.openConf()}} className='itemBracket2 mb-4'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                )}
-                                            </>
-                                        )
-                                    ) : null
-                                )
-                            })}
-                        </Col>
-                        <Col md={3} xl={3} sm={12} className='secBracket'>
-                            <div className='titBracket mb-4'>
-                                Phase 3
-                            </div>
-                            {dataBracket.length > 0 && dataBracket.map((item, index)=> {
-                                return (
-                                    item.bracket === 3 ? (
-                                        index % 2  === 1 ? (
-                                            <>
-                                                {item.status === 0 ? (
-                                                    <div className='finBracket'>
-                                                        <div className='itemBracket3 mb-2'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                        <div className='vsBracket mb-2 white'>VS</div>
-                                                        <div className='itemBracket3 mb-4'>
-                                                            {dataBracket.find(x => x.id === parseInt(item.history !== undefined && item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ')[item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ').length - 1])).name}{' (Champion)'}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div onClick={() => {this.setState({user: item}); this.openConf()}} className='itemBracket3 mb-4'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <>
-                                                {item.status === 0 ? (
-                                                    <div className='finBracket'>
-                                                        <div className='itemBracket3 mb-2'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                        <div className='vsBracket mb-2 white'>VS</div>
-                                                        <div className='itemBracket3 mb-4'>
-                                                            {dataBracket.find(x => x.id === parseInt(item.history !== undefined && item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ')[item.history.split(';')[item.history.split(';').length - 2].split(',')[1].split(' ').length - 1])).name}{' (Champion)'}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div onClick={() => {this.setState({user: item}); this.openConf()}} className='itemBracket3 mb-1'>{item.name}{item.status === 0 ? ' (Kalah)' : ''}</div>
-                                                )}
-                                                {item.status !== 0 && (
-                                                    <div className='vsBracket mb-1'>VS</div>
-                                                )}
-                                            </>
-                                        )
-                                    ) : null
-                                )
-                            })}
-                        </Col>
-                    </Row>
-                </div>
-                <Modal isOpen={this.props.auth.isLoading} size="sm">
-                    <ModalBody>
-                        <div>
-                            <div className={style.cekUpdate}>
-                                <Spinner />
-                                <div sucUpdate>Waiting....</div>
-                            </div>
-                        </div>
-                    </ModalBody>
-                </Modal>
-                <Modal isOpen={this.state.modalConf} size="md" toggle={this.openConf}>
-                    <ModalBody>
-                        <div className='mb-4 txtTrans rowCenter widthFull'>
-                            <text>{this.state.user.name} Memenangkan Pertandingan ?</text>
-                        </div>
-                        <div className='rowCenter widthFull'>
-                            <Button color='primary' onClick={() => this.updateWinBracket(this.state.user)}>Ya</Button>
-                            <Button className='ml-3' onClick={this.openConf}>Tidak</Button>
-                        </div>
-                        
-                    </ModalBody>
-                </Modal>
-            </>
-        )
-    }
+                </ModalBody>
+            </Modal>
+        </>
+    )
+  }
 }
-
-const mapStateToProps = state => ({
-    auth: state.auth
-})
-
-const mapDispatchToProps = {
-    login: auth.login,
-    setToken: auth.setToken,
-    resetError: auth.resetError,
-    getBracket: auth.getBracket,
-    generateBracket: auth.generateBracket,
-    deleteId: auth.deleteId,
-    deleteBracket: auth.deleteBracket,
-    winBracket: auth.winBracket
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Login)

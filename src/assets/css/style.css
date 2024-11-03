@@ -1996,3 +1996,78 @@ a:hover{
 .finBracket {
     background-color: #374250;
 }
+.bodyLogin {
+    color: #fafafa;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 600px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+}
+.padMod {
+    padding: 0 !important;
+    padding-left: 0px !important;
+    background-color: #3c3e44;
+}
+/* .colRick {
+    padding: 0 !important;
+    padding-left: 0px !important;
+    background-color: #3c3e44;
+} */
+.imgRicky {
+    height: 100%;
+    width: auto;
+}
+
+.imgRickyRad {
+    height: 100%;
+    width: auto;
+    border-radius: 20px 0 0 20px;
+}
+
+.dot {
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+.backGreen {
+    background-color: rgb(13, 235, 13);
+}
+.backRed {
+    background-color: red;
+}
+.backGrey {
+    background-color: grey;
+}
+.grey {
+    color: grey;
+}
+
+.divMod {
+    padding: 0 !important;
+    padding-left: 0px !important;
+    background-color: #3c3e44;
+    height: 5%;
+    width: 50%;
+    margin-bottom: 20px;
+    border-radius: 20px;
+}
+
+.divMod:hover {
+    cursor: pointer;
+}
+
+.contRick {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-top: 2%;
+    background-color: black;
+}

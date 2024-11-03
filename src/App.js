@@ -8,6 +8,9 @@ import PrivateRoute from './components/PrivateRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
+import FaceDetect from './pages/FaceDetect'
+
+import FetchData from './pages/RickData'
 
 //For Tes
 import Tes from './pages/Tes'
@@ -25,14 +28,17 @@ class App extends Component {
         <BrowserRouter>
             <Switch>
                 {/* Tanpa login */}
+                <Route path='/' exact component={Home} /> 
                 <Route path='/login' exact component={Login} /> 
                 <Route path='/register' exact component={Register} /> 
                 <Route path='/tes' exact component={Tes} />
+                <Route path='/fetch' exact component={FetchData} />
+                <Route path='/face' exact component={FaceDetect} />
                 
                 {/* Harus login */}
-                <PrivateRoute path='/' exact>
+                {/* <PrivateRoute path='/' exact>
                     <Home />
-                </PrivateRoute>
+                </PrivateRoute> */}
             </Switch>
         </BrowserRouter>
         )
