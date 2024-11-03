@@ -9,9 +9,6 @@ class FaceRecognition extends Component {
       modelsLoaded: false,
       labeledFaceDescriptors: null,
       recognizedName: 'No face detected', // State untuk menyimpan nama yang terdeteksi
-      blinkDetected: false, // State untuk menyimpan status kedipan
-      numEyeRight: 0,
-      numEyeLeft: 0
     };
   }
 
@@ -54,8 +51,8 @@ class FaceRecognition extends Component {
     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
 
     // Start detection once the video is playing
-    const intervalId = setInterval(async () => {
-      if (this.videoRef.current && this.state.modelsLoaded) {
+    setInterval(async () => {
+      if (this.videoRef.current) {
         const detections = await faceapi.detectAllFaces(
           this.videoRef.current,
           new faceapi.TinyFaceDetectorOptions()
@@ -64,50 +61,18 @@ class FaceRecognition extends Component {
         if (detections.length > 0) {
           const bestMatch = faceMatcher.findBestMatch(detections[0].descriptor);
           this.setState({ recognizedName: bestMatch.toString() }); // Update recognized name
-          
-          // Get landmarks to detect blink
-          const landmarks = detections[0].landmarks;
-          const leftEye = landmarks.getLeftEye();
-          const rightEye = landmarks.getRightEye();
-          
-          const leftEAR = this.getEyeAspectRatio(leftEye);
-          const rightEAR = this.getEyeAspectRatio(rightEye);
-
-          console.log(leftEAR)
-          console.log(rightEAR)
-
-          // Threshold untuk mendeteksi kedipan
-          const blinkThreshold = 0.28;
-          const blinkDetected = leftEAR <= blinkThreshold || rightEAR <= blinkThreshold;
-          
-          this.setState({ blinkDetected });
         } else {
-          this.setState({ recognizedName: 'No face detected', blinkDetected: false });
+          this.setState({ recognizedName: 'No face detected' });
         }
       }
     }, 1000);
-
-    // Clear the interval when the component unmounts
-    this.videoRef.current.onpause = () => clearInterval(intervalId);
   };
-
-  // Fungsi untuk menghitung Eye Aspect Ratio (EAR)
-  getEyeAspectRatio(eye) {
-    const dist = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-
-    const A = dist(eye[1], eye[5]);
-    const B = dist(eye[2], eye[4]);
-    const C = dist(eye[0], eye[3]);
-
-    return (A + B) / (2.0 * C);
-  }
 
   render() {
     return (
       <div>
         <h2>Face Recognition</h2>
-        <p>{this.state.recognizedName}</p> {/* Tampilkan nama yang terdeteksi */}
-        <p>{this.state.blinkDetected ? 'Blink detected!' : 'No blink'}</p> {/* Tampilkan status kedipan */}
+        <h4 className='mt-3'>Terdeteksi sebagai: {this.state.recognizedName}</h4> {/* Tampilkan nama yang terdeteksi */}
         {!this.state.modelsLoaded ? (
           <p>Loading models, please wait...</p>
         ) : (
