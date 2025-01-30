@@ -1,5 +1,7 @@
 import React, { Component, createRef } from 'react';
 import * as faceapi from 'face-api.js';
+import axios from 'axios';
+const REACT_APP_PHOTO_URL = process.env
 
 class FaceRecognition extends Component {
   constructor(props) {
@@ -30,11 +32,23 @@ class FaceRecognition extends Component {
   }
 
   loadLabeledImages = async () => {
-    const labels = ['andij', 'fahmi', 'ziea', 'amak', 'ayas', 'faiz', 'duta']; // Nama label atau nama karyawan
+    const data = new URLSearchParams(window.location.search)
+    const photo = data.get("photo") === undefined || data.get("photo") === null ? 'ayas' : data.get("photo") 
+    const labels = [`${photo}`]
+    console.log(labels[0])
+    // const labels = ['andij', 'fahmi', 'ziea', 'amak', 'ayas', 'faiz', 'duta']
     return Promise.all(
       labels.map(async (label) => {
-        const imgUrl = `${process.env.PUBLIC_URL}/known_faces/${label}.jpg`;
-        const img = await faceapi.fetchImage(imgUrl);
+        // const imgUrl = `${process.env.PUBLIC_URL}/known_faces/${label}.jpg`;
+        const imgUrl = `http://localhost:1000/storage/uploads/murid/${label}`;
+        const response = await axios.get(imgUrl, {
+          responseType: 'blob', // Ambil gambar dalam bentuk binary data (Blob)
+        });
+    
+        // Buat URL gambar dari Blob
+        const imageURL = URL.createObjectURL(response.data);
+  
+        const img = await faceapi.fetchImage(imageURL);
         const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
         return new faceapi.LabeledFaceDescriptors(label, [detections.descriptor]);
       })
@@ -103,9 +117,13 @@ class FaceRecognition extends Component {
   }
 
   render() {
+    const data = new URLSearchParams(window.location.search)
+    console.log(data)
+    const name = data.get("name")
+    const nisn = data.get("nisn") 
     return (
       <div>
-        <h2>Face Recognition</h2>
+        <h2>Face Recognition {name === undefined ? '' : name}</h2>
         <p>{this.state.recognizedName}</p> {/* Tampilkan nama yang terdeteksi */}
         <p>{this.state.blinkDetected ? 'Blink detected!' : 'No blink'}</p> {/* Tampilkan status kedipan */}
         {!this.state.modelsLoaded ? (

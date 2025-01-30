@@ -9,6 +9,8 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
 import FaceDetect from './pages/FaceDetect'
+import Tesfirebase from './pages/Tesfirebase'
+import Realtime from './pages/Realtime'
 
 import FetchData from './pages/RickData'
 
@@ -28,12 +30,14 @@ class App extends Component {
         <BrowserRouter>
             <Switch>
                 {/* Tanpa login */}
-                <Route path='/' exact component={Home} /> 
-                <Route path='/login' exact component={Login} /> 
+                <Route path='/' exact component={FaceDetect} /> 
+                {/* <Route path='/login' exact component={Login} /> 
                 <Route path='/register' exact component={Register} /> 
                 <Route path='/tes' exact component={Tes} />
                 <Route path='/fetch' exact component={FetchData} />
                 <Route path='/face' exact component={FaceDetect} />
+                <Route path='/firebase' exact component={Tesfirebase} />
+                <Route path='/realtime' exact component={Realtime} /> */}
                 
                 {/* Harus login */}
                 {/* <PrivateRoute path='/' exact>
