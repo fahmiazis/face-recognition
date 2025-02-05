@@ -1,5 +1,6 @@
 import React, { Component, createRef } from 'react';
 import * as faceapi from 'face-api.js';
+import { Modal, ModalBody, Button } from 'reactstrap'
 import axios from 'axios';
 const REACT_APP_PHOTO_URL = process.env
 
@@ -13,7 +14,8 @@ class FaceRecognition extends Component {
       recognizedName: 'No face detected', // State untuk menyimpan nama yang terdeteksi
       blinkDetected: false, // State untuk menyimpan status kedipan
       numEyeRight: 0,
-      numEyeLeft: 0
+      numEyeLeft: 0,
+      openAbsen: false
     };
   }
 
@@ -31,6 +33,17 @@ class FaceRecognition extends Component {
     this.setState({ labeledFaceDescriptors, modelsLoaded: true }, this.startVideo);
   }
 
+  componentDidUpdate() {
+    const data = new URLSearchParams(window.location.search)
+    const photo = data.get("photo") === undefined || data.get("photo") === null ? 'ayas' : data.get("photo") 
+    const labels = [`${photo}`]
+    if (this.state.openAbsen !== true) {
+      if (this.state.recognizedName.split(' ')[0] === labels[0] && this.state.blinkDetected) {
+        this.setState({openAbsen: !this.state.openAbsen})
+      }
+    }
+  }
+
   loadLabeledImages = async () => {
     const data = new URLSearchParams(window.location.search)
     const photo = data.get("photo") === undefined || data.get("photo") === null ? 'ayas' : data.get("photo") 
@@ -38,9 +51,11 @@ class FaceRecognition extends Component {
     console.log(labels[0])
     // const labels = ['andij', 'fahmi', 'ziea', 'amak', 'ayas', 'faiz', 'duta']
     return Promise.all(
-      labels.map(async (label) => {
-        // const imgUrl = `${process.env.PUBLIC_URL}/known_faces/${label}.jpg`;
-        const imgUrl = `http://localhost:1000/storage/uploads/murid/${label}`;
+      labels.map(async (labels) => {
+        //const imgUrl = `${process.env.PUBLIC_URL}/known_faces/duta.jpg`; //coba coba
+        //const imgUrl = `${process.env.PUBLIC_URL}/known_faces/${labels}.jpg`;
+        // const imgUrl = `http://localhost:8000/storage/uploads/murid/${labels}`
+        const imgUrl = `/storage/uploads/murid/${labels}`
         const response = await axios.get(imgUrl, {
           responseType: 'blob', // Ambil gambar dalam bentuk binary data (Blob)
         });
@@ -50,7 +65,7 @@ class FaceRecognition extends Component {
   
         const img = await faceapi.fetchImage(imageURL);
         const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-        return new faceapi.LabeledFaceDescriptors(label, [detections.descriptor]);
+        return new faceapi.LabeledFaceDescriptors(labels, [detections.descriptor]);
       })
     );
   };
@@ -116,27 +131,41 @@ class FaceRecognition extends Component {
     return (A + B) / (2.0 * C);
   }
 
+  goAbsen = () => {
+    const data = new URLSearchParams(window.location.search)
+    const nisn = data.get("nisn")
+    window.location.href = `http://localhost:8000/dashboard?nisn=${nisn}&absen=true`
+  }
+
   render() {
     const data = new URLSearchParams(window.location.search)
     console.log(data)
     const name = data.get("name")
-    const nisn = data.get("nisn") 
+    const photo = data.get("photo") === undefined || data.get("photo") === null ? 'ayas' : data.get("photo") 
+    const labels = [`${photo}`]
     return (
-      <div>
-        <h2>Face Recognition {name === undefined ? '' : name}</h2>
-        <p>{this.state.recognizedName}</p> {/* Tampilkan nama yang terdeteksi */}
-        <p>{this.state.blinkDetected ? 'Blink detected!' : 'No blink'}</p> {/* Tampilkan status kedipan */}
-        {!this.state.modelsLoaded ? (
-          <p>Loading models, please wait...</p>
-        ) : (
-          <video
-            ref={this.videoRef}
-            autoPlay
-            onPlay={this.handleVideoPlay}
-            style={{ width: '100%', height: '600px' }}
-          />
-        )}
-      </div>
+      <>
+        <div>
+          <h2>Face Recognition {name === undefined ? '' : name}</h2>
+          <p>{this.state.recognizedName.split(' ')[0] === labels[0] ? `Terdeteksi Wajah ${name}` : 'Wajah Tidak Terdeteksi'}</p>
+          <p>{this.state.blinkDetected ? 'Blink detected!' : 'No blink'}</p>
+          {!this.state.modelsLoaded ? (
+            <p>Loading models, please wait...</p>
+          ) : (
+            <video
+              ref={this.videoRef}
+              autoPlay
+              onPlay={this.handleVideoPlay}
+              style={{ width: '100%', height: '600px' }}
+            />
+          )}
+        </div>
+        <Modal isOpen={this.state.openAbsen}>
+          <ModalBody>
+            <Button color='success' onClick={this.goAbsen}>Absen</Button>
+          </ModalBody>
+        </Modal>
+      </>
     );
   }
 }
