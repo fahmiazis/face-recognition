@@ -15,7 +15,12 @@ class FaceRecognition extends Component {
       blinkDetected: false, // State untuk menyimpan status kedipan
       numEyeRight: 0,
       numEyeLeft: 0,
-      openAbsen: false
+      openAbsen: false,
+      gpsLatitude: null,
+      gpsLongitude: null,
+      ipLatitude: null,
+      ipLongitude: null,
+      fakeDetected: false,
     };
   }
 
@@ -27,6 +32,9 @@ class FaceRecognition extends Component {
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
     await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL)
+
+    this.getIPLocation();
+    this.getGPSLocation();
 
     // Load known faces
     const labeledFaceDescriptors = await this.loadLabeledImages();
@@ -134,8 +142,67 @@ class FaceRecognition extends Component {
   goAbsen = () => {
     const data = new URLSearchParams(window.location.search)
     const nisn = data.get("nisn")
-    window.location.href = `http://localhost:8000/dashboard?nisn=${nisn}&absen=true`
+    const lokasi = data.get("lokasi")
+    window.location.href = `http://localhost:8000/presensi/create?nisn=${nisn}&absen=true&lokasi=${lokasi}`
   }
+
+  getGPSLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          this.setState({ gpsLatitude: latitude, gpsLongitude: longitude }, () => {
+            this.checkFakeGPS();
+          });
+        },
+        (error) => console.error("Gagal mengambil lokasi GPS:", error),
+        { enableHighAccuracy: true }
+      );
+    } else {
+      alert("Geolocation tidak didukung di browser ini.");
+    }
+  };
+
+  getIPLocation = () => {
+    axios
+      .get("http://ip-api.com/json/")
+      .then((response) => {
+        const { lat, lon } = response.data;
+        this.setState({
+          ipLatitude: lat,
+          ipLongitude: lon,
+        });
+      })
+      .catch((error) => console.error("Gagal mengambil lokasi IP:", error));
+  };
+
+  checkFakeGPS = () => {
+    const { gpsLatitude, gpsLongitude, ipLatitude, ipLongitude } = this.state;
+
+    if (gpsLatitude && gpsLongitude && ipLatitude && ipLongitude) {
+      const distance = this.calculateDistance(gpsLatitude, gpsLongitude, ipLatitude, ipLongitude);
+      console.log(`Perbedaan lokasi: ${distance.toFixed(2)} km`);
+
+      if (distance > 50) {
+        this.setState({ fakeDetected: true });
+      }
+    }
+  };
+
+  calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius Bumi dalam km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Hasil dalam km
+  };
+
 
   render() {
     const data = new URLSearchParams(window.location.search)
@@ -143,30 +210,35 @@ class FaceRecognition extends Component {
     const name = data.get("name")
     const photo = data.get("photo") === undefined || data.get("photo") === null ? 'ayas' : data.get("photo") 
     const labels = [`${photo}`]
-    return (
-      <>
-        <div>
-          <h2>Face Recognition {name === undefined ? '' : name}</h2>
-          <p>{this.state.recognizedName.split(' ')[0] === labels[0] ? `Terdeteksi Wajah ${name}` : 'Wajah Tidak Terdeteksi'}</p>
-          <p>{this.state.blinkDetected ? 'Blink detected!' : 'No blink'}</p>
-          {!this.state.modelsLoaded ? (
-            <p>Loading models, please wait...</p>
-          ) : (
-            <video
-              ref={this.videoRef}
-              autoPlay
-              onPlay={this.handleVideoPlay}
-              style={{ width: '100%', height: '600px' }}
-            />
-          )}
-        </div>
-        <Modal isOpen={this.state.openAbsen}>
-          <ModalBody>
-            <Button color='success' onClick={this.goAbsen}>Absen</Button>
-          </ModalBody>
-        </Modal>
-      </>
-    );
+    const { gpsLatitude, gpsLongitude, ipLatitude, ipLongitude, fakeDetected } = this.state;
+    if (fakeDetected) {
+      return <h1>🚨 Fake GPS Terdeteksi! Akses Diblokir.</h1>;
+    } else {
+      return (
+        <>
+          <div>
+            <h2>Face Recognition {name === undefined ? '' : name}</h2>
+            <p>{this.state.recognizedName.split(' ')[0] === labels[0] ? `Terdeteksi Wajah ${name}` : 'Wajah Tidak Terdeteksi'}</p>
+            <p>{this.state.blinkDetected ? 'Blink detected!' : 'No blink'}</p>
+            {!this.state.modelsLoaded ? (
+              <p>Loading models, please wait...</p>
+            ) : (
+              <video
+                ref={this.videoRef}
+                autoPlay
+                onPlay={this.handleVideoPlay}
+                style={{ width: '100%', height: '600px' }}
+              />
+            )}
+          </div>
+          <Modal isOpen={this.state.openAbsen}>
+            <ModalBody>
+              <Button color='success' onClick={this.goAbsen}>Absen</Button>
+            </ModalBody>
+          </Modal>
+        </>
+      );
+    }
   }
 }
 
