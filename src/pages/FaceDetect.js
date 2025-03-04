@@ -140,10 +140,20 @@ class FaceRecognition extends Component {
   }
 
   goAbsen = () => {
-    const data = new URLSearchParams(window.location.search)
-    const nisn = data.get("nisn")
-    const lokasi = data.get("lokasi")
-    window.location.href = `http://localhost:8000/presensi/create?nisn=${nisn}&absen=true&lokasi=${lokasi}`
+    const data = new URLSearchParams(window.location.search);
+    const nisn = data.get("nisn");
+    const lokasi = data.get("lokasi");
+    const absenMasuk = data.get("absen_masuk") === "true";
+    const absenPulang = data.get("absen_pulang") === "true";
+    
+    let absenType = "";
+    if (!absenMasuk && !absenPulang) {
+        absenType = "masuk";
+    } else if (absenMasuk && !absenPulang) {
+        absenType = "pulang";
+    }
+    
+    window.location.href = `http://localhost:8000/presensi/create?nisn=${nisn}&absen=${absenType}&lokasi=${lokasi}`;
   }
 
   getGPSLocation = () => {
@@ -209,8 +219,12 @@ class FaceRecognition extends Component {
     console.log(data)
     const name = data.get("name")
     const photo = data.get("photo") === undefined || data.get("photo") === null ? 'ayas' : data.get("photo") 
+    const absenMasuk = data.get("absen_masuk") === "true";
+    const absenPulang = data.get("absen_pulang") === "true";
     const labels = [`${photo}`]
+
     const { gpsLatitude, gpsLongitude, ipLatitude, ipLongitude, fakeDetected } = this.state;
+
     if (fakeDetected) {
       return <h1>🚨 Fake GPS Terdeteksi! Akses Diblokir.</h1>;
     } else {
@@ -233,7 +247,11 @@ class FaceRecognition extends Component {
           </div>
           <Modal isOpen={this.state.openAbsen}>
             <ModalBody>
-              <Button color='success' onClick={this.goAbsen}>Absen</Button>
+              {(!absenMasuk && !absenPulang) || (absenMasuk && !absenPulang) ? (
+                <Button color='success' onClick={this.goAbsen}>Absen</Button>
+              ) : (
+                <p>Anda sudah melakukan absen hari ini.</p>
+              )}
             </ModalBody>
           </Modal>
         </>
