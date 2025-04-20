@@ -145,6 +145,12 @@ class FaceRecognition extends Component {
     const lokasi = data.get("lokasi");
     const absenMasuk = data.get("absen_masuk") === "true";
     const absenPulang = data.get("absen_pulang") === "true";
+
+    // Jika sudah absen masuk dan pulang, langsung redirect ke dashboard Laravel
+    if (absenMasuk && absenPulang) {
+      window.location.href = "http://localhost:8000/dashboard";
+      return;
+    }
     
     let absenType = "";
     if (!absenMasuk && !absenPulang) {
@@ -250,7 +256,10 @@ class FaceRecognition extends Component {
               {(!absenMasuk && !absenPulang) || (absenMasuk && !absenPulang) ? (
                 <Button color='success' onClick={this.goAbsen}>Absen</Button>
               ) : (
-                <p>Anda sudah melakukan absen hari ini.</p>
+                <>
+                  <p>Anda sudah melakukan absen hari ini.</p>
+                  <Button color='primary' onClick={this.goAbsen}>Kembali</Button>
+                </>
               )}
             </ModalBody>
           </Modal>
