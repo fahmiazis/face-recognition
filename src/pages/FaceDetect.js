@@ -236,23 +236,80 @@ class FaceRecognition extends Component {
     } else {
       return (
         <>
-          <div>
-            <h2>Face Recognition {name === undefined ? '' : name}</h2>
-            <p>{this.state.recognizedName.split(' ')[0] === labels[0] ? `Terdeteksi Wajah ${name}` : 'Wajah Tidak Terdeteksi'}</p>
-            <p>{this.state.blinkDetected ? 'Blink detected!' : 'No blink'}</p>
+          {/* Header seperti gambar pertama */}
+          <nav
+            style={{
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              padding: '12px 20px',
+              fontWeight: 'bold',
+              fontSize: '14px',
+              position: 'relative',
+              textAlign: 'center',
+            }}
+          >
+            {/* Tombol kembali */}
+            <a
+              href="http://localhost:8000/presensi/create"
+              style={{
+                color: '#fff',
+                textDecoration: 'none',
+                position: 'absolute',
+                left: '20px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '18px',
+              }}
+            >
+              &lt;
+            </a>
+            
+            {/* Judul */}
+            Halaman Face Recognition
+          </nav>
+        
+          <div style={{
+            padding: '14px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            backgroundColor: '#f4f6f8',
+            minHeight: '100vh'
+          }}>
+            <h4 style={{ color: '#333' }}>Face Recognition</h4>
+            <h5 style={{ color: '#555' }}>{name === undefined ? '' : name}</h5>
+        
+            <p style={{ fontSize: '12px', marginBottom: '5px' }}>
+              {this.state.recognizedName.split(' ')[0] === labels[0]
+                ? `Terdeteksi Wajah ${name}`
+                : 'Wajah Tidak Terdeteksi'}
+            </p>
+              
+            <p style={{ fontSize: '14px', color: '#555' }}>
+              {this.state.blinkDetected ? 'Blink detected!' : 'No blink'}
+            </p>
+              
             {!this.state.modelsLoaded ? (
-              <p>Loading models, please wait...</p>
+              <p style={{ fontSize: '12px', color: '#888' }}>Loading models, please wait...</p>
             ) : (
               <video
                 ref={this.videoRef}
                 autoPlay
                 onPlay={this.handleVideoPlay}
-                style={{ width: '100%', height: '600px' }}
+                style={{
+                  width: '80%',
+                  maxWidth: '720px',
+                  height: 'auto',
+                  borderRadius: '10px',
+                  boxShadow: '0 0 12px rgba(0,0,0,0.2)',
+                  marginTop: '20px'
+                }}
               />
             )}
           </div>
+          
           <Modal isOpen={this.state.openAbsen}>
-            <ModalBody>
+            <ModalBody style={{ textAlign: 'center' }}>
               {(!absenMasuk && !absenPulang) || (absenMasuk && !absenPulang) ? (
                 <Button color='success' onClick={this.goAbsen}>Absen</Button>
               ) : (
