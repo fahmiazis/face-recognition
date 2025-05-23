@@ -276,7 +276,7 @@ class FaceRecognition extends Component {
             backgroundColor: '#f4f6f8',
             minHeight: '100vh'
           }}>
-            <h4 style={{ color: '#333' }}>Face Recognition</h4>
+            <h4 style={{ color: '#333' }}>Verifikasi Wajah</h4>
             <h5 style={{ color: '#555' }}>{name === undefined ? '' : name}</h5>
         
             <p style={{ fontSize: '12px', marginBottom: '5px' }}>
@@ -286,11 +286,11 @@ class FaceRecognition extends Component {
             </p>
               
             <p style={{ fontSize: '14px', color: '#555' }}>
-              {this.state.blinkDetected ? 'Blink detected!' : 'No blink'}
+              {this.state.blinkDetected ? 'Kedipan Mata Terdeteksi!' : 'Tidak ada kedipan mata'}
             </p>
               
             {!this.state.modelsLoaded ? (
-              <p style={{ fontSize: '12px', color: '#888' }}>Loading models, please wait...</p>
+              <p style={{ fontSize: '20px', color: '#888' }}>Mohon perlihatkan wajah dan kedipkan mata anda di depan kamera</p>
             ) : (
               <video
                 ref={this.videoRef}
