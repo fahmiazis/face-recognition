@@ -3,6 +3,8 @@ import * as faceapi from 'face-api.js';
 import { Modal, ModalBody, Button } from 'reactstrap'
 import axios from 'axios';
 const REACT_APP_PHOTO_URL = process.env
+const url_ngrok = 'https://8c6a-182-3-105-104.ngrok-free.app'
+const url_absen = 'http://localhost:8000'
 
 class FaceRecognition extends Component {
   constructor(props) {
@@ -63,13 +65,19 @@ class FaceRecognition extends Component {
         //const imgUrl = `${process.env.PUBLIC_URL}/known_faces/duta.jpg`; //coba coba
         //const imgUrl = `${process.env.PUBLIC_URL}/known_faces/${labels}.jpg`;
         // const imgUrl = `http://localhost:8000/storage/uploads/murid/${labels}`
-        const imgUrl = `/storage/uploads/murid/${labels}`
+        const imgUrl = `${url_ngrok}/get-image/${labels}`
         const response = await axios.get(imgUrl, {
-          responseType: 'blob', // Ambil gambar dalam bentuk binary data (Blob)
+          responseType: 'blob',
+          headers: {
+            'ngrok-skip-browser-warning': 'true'
+          }
         });
     
         // Buat URL gambar dari Blob
         const imageURL = URL.createObjectURL(response.data);
+
+        console.log("Status:", response.status);
+        console.log(response);
   
         const img = await faceapi.fetchImage(imageURL);
         const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
@@ -148,7 +156,7 @@ class FaceRecognition extends Component {
 
     // Jika sudah absen masuk dan pulang, langsung redirect ke dashboard Laravel
     if (absenMasuk && absenPulang) {
-      window.location.href = "http://localhost:8000/dashboard";
+      window.location.href = `${url_absen}/dashboard`;
       return;
     }
     
@@ -159,7 +167,7 @@ class FaceRecognition extends Component {
         absenType = "pulang";
     }
     
-    window.location.href = `http://localhost:8000/presensi/create?nisn=${nisn}&absen=${absenType}&lokasi=${lokasi}`;
+    window.location.href = `${url_absen}/presensi/create?nisn=${nisn}&absen=${absenType}&lokasi=${lokasi}`;
   }
 
   getGPSLocation = () => {
@@ -181,7 +189,7 @@ class FaceRecognition extends Component {
 
   getIPLocation = () => {
     axios
-      .get("http://ip-api.com/json/")
+      .get("https://ip-api.com/json/")
       .then((response) => {
         const { lat, lon } = response.data;
         this.setState({
@@ -250,7 +258,7 @@ class FaceRecognition extends Component {
           >
             {/* Tombol kembali */}
             <a
-              href="http://localhost:8000/presensi/create"
+              href={`${url_absen}/presensi/create`}
               style={{
                 color: '#fff',
                 textDecoration: 'none',
